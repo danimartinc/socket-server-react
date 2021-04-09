@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniChat</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+</head>
+<body class="container">
+
+    <h1 class="mt-5">MiniChat</h1>
+    <hr>
+
+    <form id="myForm">
+        
+        <div class="row">
+            <div class="col-8">
+
+                <input type="text" id="txtMessage" placeholder="Mensaje" class="form-control">
+            </div>
+
+            <div class="col-4">
+                <button type="submit" class="btn btn-primary">
+                    Enviar
+                </button>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="row">
+        <div class="col">
+
+            <ul id="myMessages" class="mt-2">
+            </ul>
+        </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+
+    <script>
+        //Socket del lado del cliente, DISTINTO AL SOCKET DEL LADO DEL SERVIDOR
+        const socket = io('http://localhost:8080');
+
+        //Obtengo la referencia al formulario en el DOM
+        const formulario = document.querySelector('#myForm');
+        //Obtengo la referencia a los mensajes del chat en el DOM
+        const messages = document.querySelector('#myMessages');
+        //Referencia al input del texto
+        const txtMessage = document.querySelector('#txtMessage');
+
+        //Realizamos el posteo del formulario
+        //Paso por parametro elvento que quiero escuchar, event submit
+        //callback que se ejecuta cuando hago referencia al evento
+        formulario.addEventListener( 'submit', ( event ) =>{
+            //Evitamos la propagacion del formulario para evitar el refresh
+            event.preventDefault();
+            //Extraemos el mensaje
+            const newMessage = txtMessage.value;
+
+            //Emitimos le mensaje hacia el server
+            //Emito el event del lado del cliente
+            //Segundo argumento, envio el objeto que quiero emitir
+            socket.emit('mensaje-to-server', { text: newMessage });
+
+        });
+
+        //Escucho la notificacion del cliente
+        //Tengo todos los mensajes que cualquier otro usuario emita
+        socket.on('mensaje-from-server', ( data ) => {
+            messages.innerHTML += `<li> ${ data.text }</li>`
+            console.log(data);
+        });
+
+
+        //Mediante on escucho el los mensajes que se emiten desde el server
+        //data, lo paso como argumento para poder obtener el payload del servidor
+       /* socket.on('mensaje-bienvenida', ( data ) =>{
+            console.log( data );
+        });*/
+
+        //Para enviar un mensaje desde el cliente al servidor
+        /*setTimeout(() => {
+
+           //Emitir un evento desde el Cliente al Server
+           //Segundo argumento, envio el objeto que quiero emitir
+           socket.emit('mensaje-cliente', { msg: 'cliente', nombre: 'Daniel' });
+
+            
+        }, 2000);*/
+
+
+    </script>
+    
+</body>
+</html>
