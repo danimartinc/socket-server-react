@@ -9,6 +9,8 @@ const http     = require('http');
 const socketio = require('socket.io');
 //Importamos el path en Express
 const path     = require('path');
+const cors     = require('cors');
+
 const Socket   = require('./socket');
 
 
@@ -33,6 +35,11 @@ class Server {
         //Implementamos el Middleware use() de Express
         //Envio por argumento el directorio estatico que quiero mostrar
         this.app.use( express.static( path.resolve( __dirname, '../public' ) ) );
+
+        //Cofiguracion del CORS necesaria si queremos que otros clientes se puedan conectar al Socket Server si no estan en el mismo dominio
+        //Habilitamos CORS
+        this.app.use( cors() );
+
 
     }
 
